@@ -1,0 +1,29 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches:
+      - main  # Ya jo bhi branch aap deploy karna chahte hain
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AZURE_VM_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Connect to Azure VM and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@4.255.155.128 << 'EOF'
+            # Command to deploy your application on the Azure VM
+            cd /path/to/your/app
+            git pull origin main
+            # Any other deployment steps you need
+          EOF
